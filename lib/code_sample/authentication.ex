@@ -50,6 +50,8 @@ defmodule CodeSample.Authentication do
   """
   def update_token() do
     pem_key = JOSE.JWK.from_pem_file(Application.get_env(:sand_box, :box_pem_key))
+    # a = build_payload()
+    # h = build_header()
     {_, encoded} = JOSE.JWK.sign(build_payload, build_header, pem_key)
     assertion = "#{encoded["protected"]}.#{encoded["payload"]}.#{encoded["signature"]}"
     request = "grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer" <>

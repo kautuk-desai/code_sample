@@ -42,9 +42,40 @@ defmodule CodeSampleIntegrationTest do
     end
   end
 
-  test "We can add a comment to a file"
+  test "We can add a comment to a file", context do
+    response = CodeSample.add_comment!(context[:file_id], CodeSample.Authentication.get_token, "comment from exilir")
+    comment_id = Map.get(response, "id")
+    comment = Map.get(response, "message")
+    assert comment == "comment from exilir"
+  end
 
-  test "We can delete a comment from a file"
+  test "adding comments from a non-existant file raises an exception", context do
+    assert_raise RuntimeError, fn ->
+      CodeSample.add_comment!("1234", CodeSample.Authentication.get_token, "This comment will not be added")
+    end
+  end
 
-  test "We can modify a comment on a file"
+  test "We can delete a comment from a file", context do
+    response = CodeSample.add_comment!(context[:file_id], CodeSample.Authentication.get_token, "This comment will be deleted")
+    comment_id = Map.get(response, "id")
+    assert CodeSample.delete_comment!(comment_id, CodeSample.Authentication.get_token) == 204
+  end
+
+  test "deleting a non-existant comment raises an exception" do
+    assert_raise RuntimeError, fn ->
+      CodeSample.delete_comment!("1234", CodeSample.Authentication.get_token)
+    end
+  end
+
+  test "we can modify a comment on a file", context do
+    response = CodeSample.add_comment!(context[:file_id], CodeSample.Authentication.get_token, "This comment will be modified")
+    comment_id = Map.get(response, "id")
+    assert CodeSample.modify_comment!(comment_id, CodeSample.Authentication.get_token, "Comment modified") == "Comment modified"
+  end
+
+  test "modifying a comment from a non-existant file raises an exception" do
+    assert_raise RuntimeError, fn ->
+      CodeSample.modify_comment!("1234", CodeSample.Authentication.get_token, "Modified a comment of a file.")
+    end
+  end
 end

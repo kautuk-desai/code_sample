@@ -6,3 +6,5 @@ erl_crash.dump
 .#*
 config/config.exs
 .DS_Store
+.vscode/
+.elixir_ls/
