@@ -33,7 +33,8 @@ defmodule CodeSampleIntegrationTest do
   end
 
   test "A fresh file has no comments", context do
-    assert CodeSample.get_comments!(context[:file_id], CodeSample.Authentication.get_token) == []
+    response = CodeSample.get_comments!(context[:file_id], CodeSample.Authentication.get_token)
+    assert response == []
   end
 
   test "Getting comments from a non-existant file raises an exception", context do
@@ -49,31 +50,32 @@ defmodule CodeSampleIntegrationTest do
     assert comment == "comment from exilir"
   end
 
-  test "adding comments from a non-existant file raises an exception", context do
+  test "Adding comment on a non-existant file raises an exception" do
     assert_raise RuntimeError, fn ->
       CodeSample.add_comment!("1234", CodeSample.Authentication.get_token, "This comment will not be added")
     end
   end
 
-  test "We can delete a comment from a file", context do
+  test "We can delete a comment on a file", context do
     response = CodeSample.add_comment!(context[:file_id], CodeSample.Authentication.get_token, "This comment will be deleted")
     comment_id = Map.get(response, "id")
     assert CodeSample.delete_comment!(comment_id, CodeSample.Authentication.get_token) == 204
   end
 
-  test "deleting a non-existant comment raises an exception" do
+  test "Deleting comment from a non-existant file raises an exception" do
     assert_raise RuntimeError, fn ->
       CodeSample.delete_comment!("1234", CodeSample.Authentication.get_token)
     end
   end
 
-  test "we can modify a comment on a file", context do
+  test "We can modify a comment on a file", context do
     response = CodeSample.add_comment!(context[:file_id], CodeSample.Authentication.get_token, "This comment will be modified")
     comment_id = Map.get(response, "id")
-    assert CodeSample.modify_comment!(comment_id, CodeSample.Authentication.get_token, "Comment modified") == "Comment modified"
+    modified_comment = CodeSample.modify_comment!(comment_id, CodeSample.Authentication.get_token, "Comment modified")
+    assert modified_comment == "Comment modified"
   end
 
-  test "modifying a comment from a non-existant file raises an exception" do
+  test "Modifying a comment on a non-existant file raises an exception" do
     assert_raise RuntimeError, fn ->
       CodeSample.modify_comment!("1234", CodeSample.Authentication.get_token, "Modified a comment of a file.")
     end
